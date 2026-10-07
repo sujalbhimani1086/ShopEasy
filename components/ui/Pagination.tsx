@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 type PaginationProps = {
     currentPage: number;
     totalPages: number;
@@ -13,55 +15,61 @@ export default function Pagination({
     currentPage,
     totalPages,
     onPageChange,
-    maxVisiblePages,
     variant = "buttons",
     info,
 }: PaginationProps) {
-    if (totalPages <= 1) return null;
+    if (totalPages <= 0) return null;
 
-    const visibleCount = Math.min(
-        totalPages,
-        maxVisiblePages ?? totalPages
-    );
-    const firstPage = Math.min(
-        Math.max(1, currentPage - Math.floor((visibleCount - 1) / 2)),
-        totalPages - visibleCount + 1
-    );
-    const pages = Array.from(
-        { length: visibleCount },
-        (_, index) => firstPage + index
-    );
+    // Standardized rule: Maximum visible numbered buttons = 3
+    // Always shows only the first 3 page numbers: 1, 2, 3 (no ellipsis)
+    const buttonCount = Math.min(3, Math.max(1, totalPages));
+    const pageItems = Array.from({ length: buttonCount }, (_, i) => i + 1);
+
+    const isPrevDisabled = currentPage <= 1;
+    const isNextDisabled = currentPage >= totalPages;
+
+    const handlePrev = () => {
+        if (!isPrevDisabled) {
+            onPageChange(currentPage - 1);
+        }
+    };
+
+    const handleNext = () => {
+        if (!isNextDisabled) {
+            onPageChange(currentPage + 1);
+        }
+    };
 
     if (variant === "circles") {
         return (
             <div className="catalog-pagination">
                 <button
                     type="button"
-                    onClick={() => onPageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
+                    onClick={handlePrev}
+                    disabled={isPrevDisabled}
                 >
                     PREVIOUS
                 </button>
 
-                {pages.map((page) => {
-                    const isActive = currentPage === page;
+                {pageItems.map((pageNumber) => {
+                    const isActive = currentPage === pageNumber;
                     return (
                         <button
-                            key={page}
+                            key={pageNumber}
                             type="button"
-                            onClick={() => onPageChange(page)}
+                            onClick={() => onPageChange(pageNumber)}
                             aria-current={isActive ? "page" : undefined}
                             className={isActive ? "active" : undefined}
                         >
-                            <span>{page}</span>
+                            <span>{pageNumber}</span>
                         </button>
                     );
                 })}
 
                 <button
                     type="button"
-                    onClick={() => onPageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
+                    onClick={handleNext}
+                    disabled={isNextDisabled}
                 >
                     NEXT
                 </button>
@@ -76,32 +84,48 @@ export default function Pagination({
             <button
                 type="button"
                 className="btn"
-                onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
+                onClick={handlePrev}
+                disabled={isPrevDisabled}
             >
                 ← Previous
             </button>
 
-            {pages.map((page) => (
-                <button
-                    key={page}
-                    type="button"
-                    className={currentPage === page ? "btn btn-primary" : "btn"}
-                    onClick={() => onPageChange(page)}
-                    style={{ minWidth: "42px" }}
-                >
-                    {page}
-                </button>
-            ))}
+            {pageItems.map((pageNumber) => {
+                const isActive = currentPage === pageNumber;
+                return (
+                    <button
+                        key={pageNumber}
+                        type="button"
+                        className={isActive ? "btn btn-primary" : "btn"}
+                        onClick={() => onPageChange(pageNumber)}
+                        style={{ minWidth: "42px" }}
+                    >
+                        {pageNumber}
+                    </button>
+                );
+            })}
 
             <button
                 type="button"
                 className="btn"
-                onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
+                onClick={handleNext}
+                disabled={isNextDisabled}
             >
                 Next →
             </button>
+
+            {info && (
+                <span
+                    style={{
+                        fontSize: "13px",
+                        color: "var(--color-text-secondary)",
+                        marginLeft: "8px",
+                        alignSelf: "center",
+                    }}
+                >
+                    {info}
+                </span>
+            )}
         </div>
     );
 }

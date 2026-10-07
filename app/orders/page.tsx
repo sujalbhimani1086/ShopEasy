@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -9,6 +9,8 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import OrderStatusBadge from "@/components/ui/OrderStatusBadge";
 import Skeleton from "@/components/ui/Skeleton";
+import Pagination from "@/components/ui/Pagination";
+import ProductCountSelector from "@/components/ui/ProductCountSelector";
 
 import {
     FALLBACK_IMAGE,
@@ -16,75 +18,97 @@ import {
     formatPrice,
     normalizeImageSrc,
 } from "@/lib/utils";
-
 import type { Order } from "@/lib/types";
+
+const ORDERS_PER_PAGE_OPTIONS = [5, 10, 15, 20];
+const DEFAULT_ORDERS_PER_PAGE = 10;
 
 export default function OrdersPage() {
     const router = useRouter();
 
-    const [orders, setOrders] =
-        useState<Order[]>([]);
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalOrders, setTotalOrders] = useState(0);
+    const [ordersPerPage, setOrdersPerPage] = useState(DEFAULT_ORDERS_PER_PAGE);
 
-    const [loading, setLoading] =
-        useState(true);
+    const currentPageRef = useRef(currentPage);
+    currentPageRef.current = currentPage;
+
+    const ordersPerPageRef = useRef(ordersPerPage);
+    ordersPerPageRef.current = ordersPerPage;
 
     // ==========================================
-    // FETCH ORDERS
+    // FETCH ORDERS (SERVER-SIDE PAGINATED)
     // ==========================================
 
     const fetchOrders = useCallback(
-        async (showLoading = false) => {
+        async (
+            pageToFetch = currentPageRef.current,
+            limitToFetch = ordersPerPageRef.current,
+            showLoading = false
+        ) => {
             if (showLoading) {
                 setLoading(true);
             }
 
             try {
-                const response =
-                    await fetch(
-                        "/api/orders",
-                        {
-                            method: "GET",
-                            cache: "no-store",
-                        }
-                    );
+                const response = await fetch(
+                    `/api/orders?page=${pageToFetch}&limit=${limitToFetch}`,
+                    {
+                        method: "GET",
+                        cache: "no-store",
+                    }
+                );
 
                 // Login required
-                if (
-                    response.status === 401
-                ) {
+                if (response.status === 401) {
                     router.push("/login");
                     return;
                 }
 
                 // Approval required
-                if (
-                    response.status === 403
-                ) {
+                if (response.status === 403) {
                     router.push("/register/pending");
                     return;
                 }
 
                 if (!response.ok) {
                     setOrders([]);
+                    setTotalOrders(0);
+                    setTotalPages(1);
                     return;
                 }
 
-                const data =
-                    await response.json();
+                const data = await response.json();
 
-                if (Array.isArray(data)) {
+                if (data && Array.isArray(data.orders)) {
+                    const total = data.total ?? 0;
+                    const pages = data.totalPages ?? 1;
+
+                    setTotalOrders(total);
+                    setTotalPages(pages);
+
+                    // Safety: if the current page no longer exists after deletions
+                    if (total > 0 && pageToFetch > pages) {
+                        setCurrentPage(pages);
+                        return;
+                    }
+
+                    setOrders(data.orders);
+                } else if (Array.isArray(data)) {
+                    // Backward-compatible fallback
                     setOrders(data);
+                    setTotalOrders(data.length);
+                    setTotalPages(Math.max(1, Math.ceil(data.length / limitToFetch)));
                 } else {
                     setOrders([]);
+                    setTotalOrders(0);
+                    setTotalPages(1);
                 }
             } catch (error) {
-                console.error(
-                    "FETCH ORDERS ERROR:",
-                    error
-                );
-
-                // Don't clear existing orders
-                // during a temporary network error.
+                console.error("FETCH ORDERS ERROR:", error);
             } finally {
                 if (showLoading) {
                     setLoading(false);
@@ -94,199 +118,122 @@ export default function OrdersPage() {
         [router]
     );
 
+    const handleOrdersPerPageChange = (newCount: number) => {
+        setOrdersPerPage(newCount);
+        setCurrentPage(1);
+    };
+
     // ==========================================
-    // INITIAL LOAD + AUTO REFRESH
+    // PAGE & LIMIT CHANGE EFFECT
     // ==========================================
 
     useEffect(() => {
-        const user =
-            localStorage.getItem("user");
+        void fetchOrders(currentPage, ordersPerPage, true);
+    }, [currentPage, ordersPerPage, fetchOrders]);
 
+    // ==========================================
+    // INITIAL AUTH CHECK + AUTO REFRESH
+    // ==========================================
+
+    useEffect(() => {
+        const user = localStorage.getItem("user");
         if (!user) {
             router.push("/login");
             return;
         }
 
-        // First load
-        void fetchOrders(true);
-
         // Refresh every 5 seconds
-        const interval =
-            setInterval(() => {
-                void fetchOrders(false);
-            }, 5000);
+        const interval = setInterval(() => {
+            void fetchOrders(currentPageRef.current, ordersPerPageRef.current, false);
+        }, 5000);
 
-        // Refresh when customer comes back
-        // to this browser tab
+        // Refresh when customer comes back to this browser tab
         function handleVisibility() {
-            if (
-                document.visibilityState ===
-                "visible"
-            ) {
-                void fetchOrders(false);
+            if (document.visibilityState === "visible") {
+                void fetchOrders(currentPageRef.current, ordersPerPageRef.current, false);
             }
         }
 
-        document.addEventListener(
-            "visibilitychange",
-            handleVisibility
-        );
+        document.addEventListener("visibilitychange", handleVisibility);
 
         // Refresh when browser gets focus
         function handleFocus() {
-            void fetchOrders(false);
+            void fetchOrders(currentPageRef.current, ordersPerPageRef.current, false);
         }
 
-        window.addEventListener(
-            "focus",
-            handleFocus
-        );
+        window.addEventListener("focus", handleFocus);
 
-        // Refresh if another part of the
-        // application announces an order update
+        // Refresh if another part of the application announces an order update
         function handleOrdersUpdated() {
-            void fetchOrders(false);
+            void fetchOrders(currentPageRef.current, ordersPerPageRef.current, false);
         }
 
-        window.addEventListener(
-            "ordersUpdated",
-            handleOrdersUpdated
-        );
+        window.addEventListener("ordersUpdated", handleOrdersUpdated);
 
         return () => {
             clearInterval(interval);
-
-            document.removeEventListener(
-                "visibilitychange",
-                handleVisibility
-            );
-
-            window.removeEventListener(
-                "focus",
-                handleFocus
-            );
-
-            window.removeEventListener(
-                "ordersUpdated",
-                handleOrdersUpdated
-            );
+            document.removeEventListener("visibilitychange", handleVisibility);
+            window.removeEventListener("focus", handleFocus);
+            window.removeEventListener("ordersUpdated", handleOrdersUpdated);
         };
     }, [router, fetchOrders]);
 
     // ==========================================
-    // PAGE
+    // RENDER SHORT ORDER LISTING
     // ==========================================
 
     return (
         <PageLayout>
             <section className="container">
-
                 <SectionHeader
                     title="My Orders"
-                    subtitle="Track and view your order history"
+                    subtitle={
+                        totalOrders > 0
+                            ? `Showing page ${currentPage} of ${totalPages} • ${totalOrders} ${totalOrders === 1 ? "order" : "orders"} total`
+                            : "Track and view your order history"
+                    }
                 />
 
-                {/* LOADING */}
+                {/* ITEMS PER PAGE SELECTOR */}
+                {(totalOrders > 0 || orders.length > 0) && (
+                    <ProductCountSelector
+                        value={ordersPerPage}
+                        onChange={handleOrdersPerPageChange}
+                        options={ORDERS_PER_PAGE_OPTIONS}
+                        prefix="Show"
+                        suffix="Orders"
+                        disabled={loading}
+                    />
+                )}
 
+                {/* LOADING SKELETON */}
                 {loading ? (
                     <div className="orders-list" aria-busy="true">
                         {[1, 2, 3].map((index) => (
-                            <div key={index} className="order-card">
-                                <div
-                                    className="order-card-header"
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                    }}
-                                >
-                                    <div
-                                        className="order-meta"
-                                        style={{
-                                            display: "flex",
-                                            gap: "16px",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <Skeleton
-                                            variant="text"
-                                            width="100px"
-                                            height="20px"
-                                        />
-                                        <Skeleton
-                                            variant="text"
-                                            width="140px"
-                                            height="18px"
-                                        />
-                                    </div>
-                                    <Skeleton
-                                        variant="text"
-                                        width="90px"
-                                        height="24px"
-                                        borderRadius="9999px"
-                                    />
+                            <div
+                                key={index}
+                                className="order-card order-history-card"
+                            >
+                                <div className="order-thumbnail-grid">
+                                    <Skeleton variant="image" width="64px" height="64px" borderRadius="8px" />
                                 </div>
-                                <div className="order-items">
-                                    <div
-                                        className="order-item-row"
-                                        style={{
-                                            display: "flex",
-                                            gap: "16px",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <Skeleton
-                                            variant="image"
-                                            width="60px"
-                                            height="60px"
-                                            borderRadius="8px"
-                                        />
-                                        <div style={{ flex: 1 }}>
-                                            <Skeleton
-                                                variant="text"
-                                                width="60%"
-                                                height="20px"
-                                                style={{ marginBottom: "6px" }}
-                                            />
-                                            <Skeleton
-                                                variant="text"
-                                                width="40%"
-                                                height="16px"
-                                            />
-                                        </div>
-                                        <Skeleton
-                                            variant="text"
-                                            width="80px"
-                                            height="20px"
-                                        />
+                                <div className="order-history-info">
+                                    <div className="order-history-header">
+                                        <Skeleton variant="text" width="120px" height="22px" />
+                                        <Skeleton variant="text" width="80px" height="22px" borderRadius="12px" />
+                                    </div>
+                                    <div className="order-history-meta">
+                                        <Skeleton variant="text" width="280px" height="16px" />
                                     </div>
                                 </div>
-                                <div
-                                    className="order-card-footer"
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                        marginTop: "16px",
-                                    }}
-                                >
-                                    <Skeleton
-                                        variant="text"
-                                        width="120px"
-                                        height="18px"
-                                    />
-                                    <Skeleton
-                                        variant="text"
-                                        width="100px"
-                                        height="24px"
-                                    />
+                                <div className="order-history-action">
+                                    <Skeleton variant="text" width="100px" height="34px" borderRadius="8px" />
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : orders.length === 0 ? (
-                    /* EMPTY */
-
+                    /* EMPTY STATE */
                     <EmptyState
                         icon="📦"
                         title="No orders yet"
@@ -295,158 +242,112 @@ export default function OrdersPage() {
                         actionHref="/products"
                     />
                 ) : (
-                    /* ORDERS */
-
+                    /* SHORT ORDER LIST */
                     <div className="orders-list">
+                        {orders.map((order) => {
+                            const itemCount =
+                                order.items?.reduce(
+                                    (sum, item) => sum + (item.quantity || 1),
+                                    0
+                                ) || order.items?.length || 0;
 
-                        {orders.map(
-                            (order) => (
+                            const orderItems = order.items || [];
+
+                            return (
                                 <div
-                                    key={
-                                        order.id
-                                    }
-                                    className="order-card"
+                                    key={order.id}
+                                    className="order-card order-history-card"
                                 >
+                                    {/* LEFT: 3-COLUMN PRODUCT IMAGE GRID */}
+                                    <div className="order-thumbnail-grid">
+                                        {orderItems.length > 0 ? (
+                                            orderItems.map((item, idx) => {
+                                                const itemImage =
+                                                    item.product?.image ||
+                                                    item.productImage ||
+                                                    FALLBACK_IMAGE;
+                                                const itemName =
+                                                    item.product?.name ||
+                                                    item.productName ||
+                                                    "Product";
 
-                                    {/* =========================
-                                        ORDER HEADER
-                                    ========================= */}
-
-                                    <div className="order-card-header">
-
-                                        <div className="order-meta">
-
-                                            <span className="order-id">
-                                                Order #
-                                                {
-                                                    order.id
-                                                }
-                                            </span>
-
-                                            <span className="order-date">
-                                                {formatDate(
-                                                    order.createdAt
-                                                )}
-                                            </span>
-
-                                        </div>
-
-                                        {/* STATUS */}
-
-                                        <OrderStatusBadge
-                                            status={order.status}
-                                        />
-
-                                    </div>
-
-                                    {/* =========================
-                                        ORDER ITEMS
-                                    ========================= */}
-
-                                    <div className="order-items">
-
-                                        {order.items.map(
-                                            (
-                                                item
-                                            ) => (
-                                                <div
-                                                    key={
-                                                        item.id
-                                                    }
-                                                    className="order-item-row"
-                                                >
-
-                                                    {/* IMAGE */}
-
-                                                    <div className="order-item-image">
-
+                                                return (
+                                                    <div
+                                                        key={item.id || idx}
+                                                        className="order-thumbnail-item"
+                                                        title={itemName}
+                                                    >
                                                         <Image
-                                                            src={normalizeImageSrc(
-                                                                item.product?.image ||
-                                                                    item.productImage ||
-                                                                    FALLBACK_IMAGE
-                                                            )}
-                                                            alt={
-                                                                item.product?.name ||
-                                                                    item.productName ||
-                                                                    "Product"
-                                                            }
-                                                            width={76}
-                                                            height={76}
+                                                            src={normalizeImageSrc(itemImage)}
+                                                            alt={itemName}
+                                                            fill
+                                                            sizes="64px"
                                                             unoptimized
                                                             onError={(e) => {
                                                                 (e.currentTarget as HTMLImageElement).src = FALLBACK_IMAGE;
                                                             }}
                                                         />
-
                                                     </div>
-
-                                                    {/* PRODUCT INFO */}
-
-                                                    <div className="order-item-info">
-
-                                                        <h4>
-                                                            {item.product?.name ||
-                                                                item.productName ||
-                                                                "Product Unavailable"}
-                                                        </h4>
-
-                                                        <span className="order-item-qty">
-                                                            Qty:{" "}
-                                                            {
-                                                                item.quantity
-                                                            }
-                                                        </span>
-
-                                                        <span className="order-item-unit-price">
-                                                            Price:{" "}
-                                                            {formatPrice(
-                                                                item.price
-                                                            )}
-                                                        </span>
-
-                                                    </div>
-
-                                                    {/* ITEM TOTAL */}
-
-                                                    <span className="order-item-price">
-                                                        {formatPrice(
-                                                            item.price *
-                                                                item.quantity
-                                                        )}
-                                                    </span>
-
-                                                </div>
-                                            )
+                                                );
+                                            })
+                                        ) : (
+                                            <div
+                                                className="order-thumbnail-item"
+                                                style={{ fontSize: "24px" }}
+                                            >
+                                                📦
+                                            </div>
                                         )}
-
                                     </div>
 
-                                    {/* =========================
-                                        ORDER FOOTER
-                                    ========================= */}
+                                    {/* MIDDLE: ORDER INFORMATION */}
+                                    <div className="order-history-info">
+                                        <div className="order-history-header">
+                                            <span className="order-id">
+                                                Order #{order.id}
+                                            </span>
+                                            <OrderStatusBadge status={order.status} />
+                                        </div>
 
-                                    <div className="order-card-footer">
-
-                                        <span className="order-total-label">
-                                            Order Total
-                                        </span>
-
-                                        <span className="order-total-value">
-                                            {formatPrice(
-                                                order.total
-                                            )}
-                                        </span>
-
+                                        <div className="order-history-meta">
+                                            <span>Placed: {formatDate(order.createdAt)}</span>
+                                            <span className="order-meta-dot">•</span>
+                                            <span>
+                                                {itemCount} {itemCount === 1 ? "Item" : "Items"}
+                                            </span>
+                                            <span className="order-meta-dot">•</span>
+                                            <span className="order-meta-total">
+                                                Total: {formatPrice(order.total)}
+                                            </span>
+                                        </div>
                                     </div>
 
+                                    {/* RIGHT: VIEW ORDER BUTTON */}
+                                    <div className="order-history-action">
+                                        <button
+                                            type="button"
+                                            className="btn btn-primary btn-sm"
+                                            onClick={() => router.push(`/orders/${order.id}`)}
+                                        >
+                                            View Order →
+                                        </button>
+                                    </div>
                                 </div>
-                            )
-                        )}
+                            );
+                        })}
 
+                        {/* STANDARDIZED PAGINATION */}
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={(page) => {
+                                setCurrentPage(page);
+                                window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                            variant="buttons"
+                        />
                     </div>
                 )}
-
             </section>
         </PageLayout>
     );

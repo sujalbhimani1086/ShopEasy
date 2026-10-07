@@ -19,7 +19,7 @@ export default function OrderSuccess() {
                                 href="/orders"
                                 className="btn btn-secondary btn-lg"
                             >
-                                📦 View My Orders
+                                📦 View Orders & Download Invoice
                             </Link>
 
                             <Link

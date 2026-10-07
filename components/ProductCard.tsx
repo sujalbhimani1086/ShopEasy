@@ -197,6 +197,39 @@ export default function ProductCard({
           {product.name}
         </h3>
 
+        {!adminMode && product.averageRating !== undefined && product.averageRating > 0 && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              marginTop: "-4px",
+              marginBottom: "8px",
+              fontSize: "13px",
+              color: "var(--color-text-secondary)",
+            }}
+          >
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "2px",
+                background: "var(--color-primary-50, #f5f3ff)",
+                color: "var(--color-primary-700, #4338ca)",
+                padding: "2px 6px",
+                borderRadius: "4px",
+                fontWeight: 600,
+                fontSize: "12px",
+              }}
+            >
+              ★ {product.averageRating.toFixed(1)}
+            </span>
+            {product.reviewCount !== undefined && (
+              <span>({product.reviewCount})</span>
+            )}
+          </div>
+        )}
+
         {adminMode ? (
           <div className="card-content">
             <p>Price: {formatPrice(product.price)}</p>

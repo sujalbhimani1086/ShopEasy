@@ -16,9 +16,10 @@ model User {
   status    String   @default("PENDING")
   createdAt DateTime @default(now())
 
-  cart       Cart?
-  orders     Order[]
-  wishlists  Wishlist[]
+  cart      Cart?
+  orders    Order[]
+  wishlists Wishlist[]
+  reviews   Review[]
 
   @@map("Users")
 }
@@ -37,6 +38,7 @@ model Product {
   cartItems  CartItem[]
   orderItems OrderItem[]
   wishlists  Wishlist[]
+  reviews    Review[]
 
   @@map("Products")
 }
@@ -88,19 +90,24 @@ model Wishlist {
 }
 
 model Order {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  name      String?
-  email     String?
-  address   String?
-  city      String?
-  pincode   String?
-  total     Int
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  name       String?
+  email      String?
+  address    String?
+  city       String?
+  pincode    String?
+  subtotal   Int?
+  discount   Int      @default(0)
+  couponCode String?
+  couponId   Int?
+  total      Int
+  status     String   @default("PENDING")
+  createdAt  DateTime @default(now())
 
-  user  User        @relation(fields: [userId], references: [id])
-  items OrderItem[]
+  user   User        @relation(fields: [userId], references: [id])
+  items  OrderItem[]
+  coupon Coupon?     @relation(fields: [couponId], references: [id], onDelete: SetNull)
 
   @@map("Orders")
 }
@@ -118,4 +125,39 @@ model OrderItem {
   product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 
   @@map("OrderItems")
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  rating    Int
+  comment   String   @db.NVarChar(1000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("Reviews")
+}
+
+model Coupon {
+  id             Int       @id @default(autoincrement())
+  code           String    @unique
+  discountType   String
+  discountValue  Int
+  minOrderAmount Int       @default(0)
+  maxDiscount    Int?
+  usageLimit     Int?
+  usedCount      Int       @default(0)
+  expiresAt      DateTime?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  orders Order[]
+
+  @@map("Coupons")
 }

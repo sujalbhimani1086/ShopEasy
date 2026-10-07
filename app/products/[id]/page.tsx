@@ -20,6 +20,7 @@ import {
     FALLBACK_IMAGE,
 } from "@/lib/utils";
 import { addToCart, getCart } from "@/hooks/useCart";
+import ProductReviews from "@/components/reviews/ProductReviews";
 import type { Product } from "@/lib/types";
 
 export default function ProductDetailsPage() {
@@ -614,6 +615,8 @@ export default function ProductDetailsPage() {
                         </p>
                     </div>
                 </div>
+
+                <ProductReviews productId={product.id} productName={product.name} />
             </main>
 
             <Footer />

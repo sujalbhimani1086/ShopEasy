@@ -23,6 +23,8 @@ import ProductCardSkeleton from "@/components/ui/ProductCardSkeleton";
 import TableSkeleton from "@/components/ui/TableSkeleton";
 import CategoryManagement from "@/components/admin/CategoryManagement";
 import RegistrationManagement from "@/components/admin/RegistrationManagement";
+import CouponManagement from "@/components/admin/CouponManagement";
+import ReviewManagement from "@/components/admin/ReviewManagement";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 import { formatDate, formatPrice, normalizeImageSrc, FALLBACK_IMAGE } from "@/lib/utils";
@@ -48,6 +50,8 @@ const VALID_SECTIONS: AdminSection[] = [
   "users",
   "categories",
   "registrations",
+  "coupons",
+  "reviews",
 ];
 
 const thStyle: React.CSSProperties = {
@@ -1427,6 +1431,32 @@ function AdminContent() {
   }
 
   // ==========================================
+  // COUPONS TAB
+  // ==========================================
+  if (activeSection === "coupons") {
+    return (
+      <PageLayout>
+        <div style={{ paddingTop: "20px", paddingBottom: "40px" }}>
+          <CouponManagement />
+        </div>
+      </PageLayout>
+    );
+  }
+
+  // ==========================================
+  // REVIEWS TAB
+  // ==========================================
+  if (activeSection === "reviews") {
+    return (
+      <PageLayout>
+        <div style={{ paddingTop: "20px", paddingBottom: "40px" }}>
+          <ReviewManagement />
+        </div>
+      </PageLayout>
+    );
+  }
+
+  // ==========================================
   // USERS TAB
   // ==========================================
   if (activeSection === "users") {
@@ -2144,6 +2174,12 @@ function AdminContent() {
 
                       <td style={{ ...tdTopStyle, whiteSpace: "nowrap" }}>
                         <strong>{formatPrice(order.total)}</strong>
+                        {order.couponCode && (
+                          <div style={{ fontSize: "11px", color: "var(--color-success)", marginTop: "3px" }}>
+                            🎟️ {order.couponCode}
+                            {order.discount ? ` (-${formatPrice(order.discount)})` : ""}
+                          </div>
+                        )}
                       </td>
 
                       <td style={tdTopStyle}>

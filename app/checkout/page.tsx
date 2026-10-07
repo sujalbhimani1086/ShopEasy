@@ -10,6 +10,8 @@ import Skeleton from "@/components/ui/Skeleton";
 
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { clearCart, getCart } from "@/hooks/useCart";
+import CouponInput, { type AppliedCouponData } from "@/components/checkout/CouponInput";
+import { calculateFinalPrice, formatPrice } from "@/lib/utils";
 
 import type { Product, CartItem } from "@/lib/types";
 
@@ -39,6 +41,21 @@ export default function Checkout() {
 
     const [loading, setLoading] =
         useState(false);
+
+    const [appliedCoupon, setAppliedCoupon] =
+        useState<AppliedCouponData | null>(null);
+
+    const subtotal = cart.reduce((sum, item) => {
+        const price = calculateFinalPrice(item.price, item.discount);
+        return sum + price * item.quantity;
+    }, 0);
+
+    const itemCount = cart.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+    );
+
+    const finalTotal = Math.max(0, subtotal - (appliedCoupon?.discountAmount || 0));
 
     // -----------------------------
     // LOAD CART + PRODUCTS
@@ -228,6 +245,7 @@ export default function Checkout() {
                         address: address.trim(),
                         city: city.trim(),
                         pincode: pincode.trim(),
+                        couponCode: appliedCoupon?.code || undefined,
 
                         items: cart.map(
                             (item) => ({
@@ -626,6 +644,41 @@ export default function Checkout() {
                                 )}
                             </div>
 
+                        </div>
+
+                        {/* ORDER & COUPON SUMMARY */}
+                        <div style={{ marginTop: "var(--space-6)", paddingTop: "var(--space-6)", borderTop: "1px solid var(--color-border)" }}>
+                            <h4 style={{ fontSize: "var(--text-lg)", fontWeight: "var(--font-semibold)", marginBottom: "var(--space-4)", color: "var(--color-text)" }}>
+                                Order Summary
+                            </h4>
+
+                            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", marginBottom: "var(--space-5)", fontSize: "var(--text-sm)" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", color: "var(--color-text-secondary)" }}>
+                                    <span>Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"}):</span>
+                                    <span style={{ fontWeight: "var(--font-medium)", color: "var(--color-text)" }}>{formatPrice(subtotal)}</span>
+                                </div>
+                                {appliedCoupon && (
+                                    <div style={{ display: "flex", justifyContent: "space-between", color: "var(--color-success)" }}>
+                                        <span>Discount ({appliedCoupon.code}):</span>
+                                        <span style={{ fontWeight: "var(--font-semibold)" }}>-{formatPrice(appliedCoupon.discountAmount)}</span>
+                                    </div>
+                                )}
+                                <div style={{ display: "flex", justifyContent: "space-between", color: "var(--color-text-secondary)" }}>
+                                    <span>Shipping:</span>
+                                    <span style={{ color: "var(--color-success)", fontWeight: "var(--font-semibold)" }}>FREE</span>
+                                </div>
+                                <div style={{ display: "flex", justifyContent: "space-between", paddingTop: "var(--space-3)", marginTop: "var(--space-2)", borderTop: "1px dashed var(--color-border)", fontSize: "var(--text-base)", fontWeight: "var(--font-bold)", color: "var(--color-text)" }}>
+                                    <span>Total Payable:</span>
+                                    <span style={{ color: "var(--color-primary-600)" }}>{formatPrice(finalTotal)}</span>
+                                </div>
+                            </div>
+
+                            <CouponInput
+                                subtotal={subtotal}
+                                appliedCoupon={appliedCoupon}
+                                onApply={setAppliedCoupon}
+                                onRemove={() => setAppliedCoupon(null)}
+                            />
                         </div>
 
                         {/* BUTTONS */}

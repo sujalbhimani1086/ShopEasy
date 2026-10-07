@@ -1022,6 +1022,120 @@
     font-weight: var(--font-extrabold);
 }
 
+/* ===================================================
+   MY ORDERS COMPACT LIST CARD (3-COLUMN LAYOUT)
+   =================================================== */
+
+.order-history-card {
+    display: grid;
+    grid-template-columns: 208px 1fr auto;
+    align-items: center;
+    gap: 24px;
+    padding: 18px 24px;
+    margin-bottom: 1rem;
+}
+
+.order-thumbnail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 64px);
+    gap: 8px;
+    width: 208px;
+    flex-shrink: 0;
+}
+
+.order-thumbnail-item {
+    width: 64px;
+    height: 64px;
+    position: relative;
+    border-radius: var(--radius-md, 8px);
+    overflow: hidden;
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.order-thumbnail-item img {
+    object-fit: contain;
+    padding: 4px;
+}
+
+.order-history-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.order-history-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.order-history-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    flex-wrap: wrap;
+}
+
+.order-meta-dot {
+    color: var(--color-text-tertiary, #9ca3af);
+    user-select: none;
+}
+
+.order-meta-total {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.order-history-action {
+    flex-shrink: 0;
+    justify-self: end;
+}
+
+@media (max-width: 900px) {
+    .order-history-card {
+        grid-template-columns: 208px 1fr;
+        gap: 16px;
+    }
+
+    .order-history-action {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 600px) {
+    .order-history-card {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 16px;
+    }
+
+    .order-thumbnail-grid {
+        width: 100%;
+        max-width: 208px;
+    }
+
+    .order-history-action {
+        grid-column: 1 / -1;
+    }
+
+    .order-history-action button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+
 
 /* ===================================================
    AUTH PAGES

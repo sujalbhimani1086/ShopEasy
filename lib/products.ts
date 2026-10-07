@@ -78,6 +78,11 @@ export async function getProductsData(
                 category: true,
                 image: true,
                 stock: true,
+                reviews: {
+                    select: {
+                        rating: true,
+                    },
+                },
             },
             orderBy,
             skip: (page - 1) * limit,
@@ -98,8 +103,24 @@ export async function getProductsData(
 
     const totalPages = Math.ceil(total / limit);
 
+    const formattedProducts: Product[] = products.map((p) => {
+        const count = p.reviews?.length || 0;
+        const avg = count > 0 ? p.reviews.reduce((s, r) => s + r.rating, 0) / count : 0;
+        return {
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            discount: p.discount,
+            category: p.category,
+            image: p.image,
+            stock: p.stock,
+            averageRating: count > 0 ? Number(avg.toFixed(1)) : 0,
+            reviewCount: count,
+        };
+    });
+
     return {
-        products,
+        products: formattedProducts,
         total,
         page,
         limit,
@@ -118,7 +139,7 @@ export async function getProductById(
         return null;
     }
 
-    return prisma.product.findUnique({
+    const product = await prisma.product.findUnique({
         where: { id: numericId },
         select: {
             id: true,
@@ -128,8 +149,30 @@ export async function getProductById(
             category: true,
             image: true,
             stock: true,
+            reviews: {
+                select: {
+                    rating: true,
+                },
+            },
         },
     });
+
+    if (!product) return null;
+
+    const count = product.reviews?.length || 0;
+    const avg = count > 0 ? product.reviews.reduce((s, r) => s + r.rating, 0) / count : 0;
+
+    return {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        discount: product.discount,
+        category: product.category,
+        image: product.image,
+        stock: product.stock,
+        averageRating: count > 0 ? Number(avg.toFixed(1)) : 0,
+        reviewCount: count,
+    };
 }
 
 export async function getCategoryBannerProducts(): Promise<Product[]> {

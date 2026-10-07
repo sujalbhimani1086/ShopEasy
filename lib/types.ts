@@ -24,6 +24,8 @@ export type Product = {
     category: string;
     image: string;
     stock: number;
+    averageRating?: number;
+    reviewCount?: number;
     createdAt?: string;
     updatedAt?: string;
 };
@@ -81,24 +83,42 @@ export type Order = {
     address?: string | null;
     city?: string | null;
     pincode?: string | null;
+    subtotal?: number | null;
+    discount?: number;
+    couponCode?: string | null;
     total: number;
     status: OrderStatus;
     createdAt: string;
     items: OrderItem[];
 };
 
-export type AdminOrderStatus = "PENDING" | "DELIVERED" | "COMPLETED";
+export type AdminOrderStatus =
+    | "PENDING"
+    | "CONFIRMED"
+    | "PACKED"
+    | "SHIPPED"
+    | "DELIVERED"
+    | "COMPLETED"
+    | "CANCELLED";
 
 export const ADMIN_ORDER_STATUSES: AdminOrderStatus[] = [
     "PENDING",
+    "CONFIRMED",
+    "PACKED",
+    "SHIPPED",
     "DELIVERED",
     "COMPLETED",
+    "CANCELLED",
 ];
 
 export const ORDER_STATUS_OPTIONS: { label: AdminOrderStatus; value: AdminOrderStatus }[] = [
     { label: "PENDING", value: "PENDING" },
+    { label: "CONFIRMED", value: "CONFIRMED" },
+    { label: "PACKED", value: "PACKED" },
+    { label: "SHIPPED", value: "SHIPPED" },
     { label: "DELIVERED", value: "DELIVERED" },
     { label: "COMPLETED", value: "COMPLETED" },
+    { label: "CANCELLED", value: "CANCELLED" },
 ];
 
 export type AdminOrderItem = {
@@ -123,6 +143,9 @@ export type AdminOrder = {
     address: string | null;
     city: string | null;
     pincode: string | null;
+    subtotal?: number | null;
+    discount?: number;
+    couponCode?: string | null;
     total: number;
     status: string;
     createdAt: string;
@@ -152,7 +175,64 @@ export type AdminSection =
     | "analytics"
     | "users"
     | "categories"
-    | "registrations";
+    | "registrations"
+    | "coupons"
+    | "reviews";
+
+export type Review = {
+    id: number;
+    userId: number;
+    productId: number;
+    rating: number;
+    comment: string;
+    createdAt: string;
+    updatedAt: string;
+    userName?: string;
+    isVerifiedBuyer?: boolean;
+};
+
+export type ReviewStats = {
+    averageRating: number;
+    totalReviews: number;
+    ratingBreakdown: {
+        5: number;
+        4: number;
+        3: number;
+        2: number;
+        1: number;
+    };
+    isEligibleToReview?: boolean;
+    userReview?: Review | null;
+};
+
+export type AdminReview = {
+    id: number;
+    userId: number;
+    userName: string;
+    userEmail: string;
+    productId: number;
+    productName: string;
+    productImage: string;
+    rating: number;
+    comment: string;
+    isVerifiedBuyer: boolean;
+    createdAt: string;
+};
+
+export type Coupon = {
+    id: number;
+    code: string;
+    discountType: "PERCENTAGE" | "FIXED";
+    discountValue: number;
+    minOrderAmount: number;
+    maxDiscount?: number | null;
+    usageLimit?: number | null;
+    usedCount: number;
+    expiresAt?: string | null;
+    isActive: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+};
 
 export type RegistrationRequest = {
     id: number;

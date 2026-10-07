@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+
 import { syncCartToBackend } from "@/hooks/useCart";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { triggerLogoutTransition } from "@/components/ui/LoginTransition";
+
 import type { CartItem, Product, User } from "@/lib/types";
 
 export default function Navbar() {
@@ -20,7 +22,21 @@ export default function Navbar() {
 
     const [categories, setCategories] = useState<string[]>([]);
     const [showCategories, setShowCategories] = useState(false);
-    const [pendingRegistrationsCount, setPendingRegistrationsCount] = useState(0);
+    const [pendingRegistrationsCount, setPendingRegistrationsCount] =
+        useState(0);
+
+    const categoryIcons: Record<string, string> = {
+        Accessories: "💍",
+        Bags: "🎒",
+        Beauty: "💄",
+        Books: "📚",
+        Clothing: "👕",
+        Electronics: "💻",
+        Footwear: "👟",
+        "Home & Kitchen": "🏠",
+        Sports: "⚽",
+        Toys: "🧸",
+    };
 
     useEffect(() => {
         function checkUser() {
@@ -79,6 +95,7 @@ export default function Navbar() {
                 if (response.ok) {
                     const data: { id: number; name: string }[] =
                         await response.json();
+
                     if (Array.isArray(data)) {
                         setCategories(
                             data
@@ -86,12 +103,14 @@ export default function Navbar() {
                                 .filter(Boolean)
                                 .sort()
                         );
+
                         return;
                     }
                 }
 
                 // Fallback to /api/products
                 const fallbackRes = await fetch("/api/products");
+
                 if (fallbackRes.ok) {
                     const data: {
                         products: Product[];
@@ -103,10 +122,7 @@ export default function Navbar() {
                     );
                 }
             } catch (error) {
-                console.error(
-                    "CATEGORY LOAD ERROR:",
-                    error
-                );
+                console.error("CATEGORY LOAD ERROR:", error);
             }
         }
 
@@ -116,7 +132,11 @@ export default function Navbar() {
             void loadCategories();
         };
 
-        window.addEventListener("categoriesUpdated", handleCategoriesUpdated);
+        window.addEventListener(
+            "categoriesUpdated",
+            handleCategoriesUpdated
+        );
+
         return () => {
             window.removeEventListener(
                 "categoriesUpdated",
@@ -125,11 +145,11 @@ export default function Navbar() {
         };
     }, []);
 
-
     useEffect(() => {
         function syncTheme() {
             try {
                 const savedTheme = localStorage.getItem("theme");
+
                 if (savedTheme === "dark") {
                     setDark(true);
                     document.body.classList.add("dark");
@@ -142,6 +162,7 @@ export default function Navbar() {
                     const isDark =
                         document.body.classList.contains("dark") ||
                         document.documentElement.classList.contains("dark");
+
                     setDark(isDark);
                 }
             } catch {}
@@ -166,12 +187,14 @@ export default function Navbar() {
         if (newDark) {
             document.body.classList.add("dark");
             document.documentElement.classList.add("dark");
+
             try {
                 localStorage.setItem("theme", "dark");
             } catch {}
         } else {
             document.body.classList.remove("dark");
             document.documentElement.classList.remove("dark");
+
             try {
                 localStorage.setItem("theme", "light");
             } catch {}
@@ -232,10 +255,19 @@ export default function Navbar() {
 
         async function fetchPendingCount() {
             try {
-                const res = await fetch("/api/admin/registrations", { cache: "no-store" });
+                const res = await fetch(
+                    "/api/admin/registrations",
+                    {
+                        cache: "no-store",
+                    }
+                );
+
                 if (res.ok) {
                     const data = await res.json();
-                    setPendingRegistrationsCount(data.pendingCount || 0);
+
+                    setPendingRegistrationsCount(
+                        data.pendingCount || 0
+                    );
                 }
             } catch {}
         }
@@ -243,17 +275,31 @@ export default function Navbar() {
         void fetchPendingCount();
 
         const handleUpdate = (e: Event) => {
-            const customEvent = e as CustomEvent<{ pendingCount?: number }>;
-            if (customEvent.detail && typeof customEvent.detail.pendingCount === "number") {
-                setPendingRegistrationsCount(customEvent.detail.pendingCount);
+            const customEvent =
+                e as CustomEvent<{ pendingCount?: number }>;
+
+            if (
+                customEvent.detail &&
+                typeof customEvent.detail.pendingCount === "number"
+            ) {
+                setPendingRegistrationsCount(
+                    customEvent.detail.pendingCount
+                );
             } else {
                 void fetchPendingCount();
             }
         };
 
-        window.addEventListener("registrationRequestsUpdated", handleUpdate);
+        window.addEventListener(
+            "registrationRequestsUpdated",
+            handleUpdate
+        );
+
         return () => {
-            window.removeEventListener("registrationRequestsUpdated", handleUpdate);
+            window.removeEventListener(
+                "registrationRequestsUpdated",
+                handleUpdate
+            );
         };
     }, [isAdmin]);
 
@@ -283,6 +329,14 @@ export default function Navbar() {
                             📦 Order Management
                         </Link>
 
+                        <Link href="/admin?section=coupons">
+                            🎟️ Coupons
+                        </Link>
+
+                        <Link href="/admin?section=reviews">
+                            ⭐ Reviews
+                        </Link>
+
                         <Link href="/admin?section=analytics">
                             📊 Analytics
                         </Link>
@@ -304,6 +358,7 @@ export default function Navbar() {
                             }}
                         >
                             <span>📝 Registrations</span>
+
                             {pendingRegistrationsCount > 0 && (
                                 <span
                                     style={{
@@ -353,11 +408,11 @@ export default function Navbar() {
                                 type="button"
                                 className="category-nav-button"
                                 onClick={() =>
-                                setShowCategories(
-                                    (previous) => !previous
-                                )
-                            }
-                        >
+                                    setShowCategories(
+                                        (previous) => !previous
+                                    )
+                                }
+                            >
                                 📂 Categories ▾
                             </button>
 
@@ -428,7 +483,8 @@ export default function Navbar() {
                                                 width: "100%",
                                                 textAlign: "left",
                                                 border: "none",
-                                                background: "transparent",
+                                                background:
+                                                    "transparent",
                                                 color: "inherit",
                                                 padding: "10px 12px",
                                                 borderRadius: "6px",
@@ -450,6 +506,8 @@ export default function Navbar() {
                                                     "inherit";
                                             }}
                                         >
+                                            {categoryIcons[category] ||
+                                                "📁"}{" "}
                                             {category}
                                         </button>
                                     ))}
@@ -541,7 +599,9 @@ export default function Navbar() {
                 cancelText="Cancel"
                 variant="danger"
                 onConfirm={confirmLogout}
-                onCancel={() => setShowLogoutConfirm(false)}
+                onCancel={() =>
+                    setShowLogoutConfirm(false)
+                }
             />
         </nav>
     );
