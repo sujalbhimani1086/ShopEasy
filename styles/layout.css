@@ -1,0 +1,317 @@
+/* ===================================================
+   Layout Styles
+   Navbar, Footer, Page Structure
+   =================================================== */
+
+
+/* ===================================================
+   NAVBAR
+   =================================================== */
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-navbar);
+    height: var(--navbar-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5%;
+    gap: var(--space-8);
+    background: var(--gradient-nav);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    animation: slideInDown 0.4s ease-out;
+}
+
+
+/* ===================================================
+   LOGO
+   =================================================== */
+
+.navbar .logo a {
+    font-size: var(--text-xl);
+    font-weight: var(--font-extrabold);
+    color: #ffffff !important;
+    letter-spacing: -0.03em;
+    transition: opacity var(--transition-fast);
+}
+
+.navbar .logo a:hover {
+    opacity: 0.85;
+    color: #ffffff !important;
+}
+
+
+/* ===================================================
+   NAVIGATION
+   =================================================== */
+
+.nav-center {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    white-space: nowrap;
+}
+
+.nav-right .user-name {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+}
+
+
+/* ===================================================
+   CART BADGE
+   =================================================== */
+
+.cart-badge {
+    position: relative;
+}
+
+.cart-count {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-danger);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: var(--font-bold);
+    border-radius: var(--radius-full);
+    animation: bounceIn 0.4s ease-out;
+}
+
+
+/* ===================================================
+   THEME SWITCH
+   =================================================== */
+
+.theme-switch {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.theme-switch .slider {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-size: 14px;
+}
+
+.theme-switch .slider::before {
+    content: "🌙";
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    font-size: 12px;
+    transition: all var(--transition-base);
+}
+
+.theme-switch input:checked + .slider {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.theme-switch input:checked + .slider::before {
+    content: "☀️";
+    transform: translateX(22px);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+/* ===================================================
+   FOOTER
+   =================================================== */
+
+.footer {
+    margin-top: auto;
+    padding: var(--space-12) 0;
+    background: var(--gradient-nav);
+    color: rgba(255, 255, 255, 0.6);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.footer-content,
+.footer-bottom {
+    max-width: var(--max-width);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: var(--space-12);
+    padding: 0 var(--space-6);
+}
+
+
+/* ===================================================
+   FOOTER BRAND
+   =================================================== */
+
+.footer-brand h3 {
+    margin-bottom: var(--space-3);
+    color: #ffffff;
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    letter-spacing: -0.02em;
+}
+
+.footer-brand p {
+    max-width: 320px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+}
+
+
+/* ===================================================
+   FOOTER SECTIONS
+   =================================================== */
+
+.footer-section h4 {
+    margin-bottom: var(--space-4);
+    color: #ffffff;
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section li {
+    margin-bottom: var(--space-2);
+}
+
+.footer-section a {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: var(--text-sm);
+    transition: color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.footer-section a:hover,
+.footer-section a:focus,
+.footer-section a:active,
+.footer-section a:visited:hover {
+    color: #ffffff !important;
+    opacity: 1;
+}
+
+
+/* ===================================================
+   FOOTER BOTTOM
+   =================================================== */
+
+.footer-bottom {
+    margin-top: var(--space-8);
+    padding: var(--space-6) var(--space-6) 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: var(--text-sm);
+}
+
+
+/* ===================================================
+   PAGE LAYOUT
+   =================================================== */
+
+.page-content {
+    flex: 1;
+    padding-top: var(--space-10);
+    padding-bottom: var(--space-16);
+    animation: fadeIn 0.4s ease-out;
+}
+
+
+/* ===================================================
+   RESPONSIVE
+   =================================================== */
+
+@media (max-width: 900px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+        text-align: center;
+    }
+
+    .footer-brand p {
+        max-width: none;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .navbar {
+        height: auto;
+        min-height: var(--navbar-height);
+        flex-wrap: wrap;
+        padding: var(--space-3) var(--space-4);
+        gap: var(--space-4);
+    }
+
+    .nav-center {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        gap: var(--space-1);
+        flex-wrap: wrap;
+    }
+
+    .nav-center a,
+    .nav-center .category-nav-button {
+        font-size: var(--text-xs);
+        padding: var(--space-2) var(--space-3);
+    }
+
+    .nav-right {
+        gap: var(--space-3);
+    }
+
+    .nav-right .user-name {
+        display: none;
+    }
+}
+
+
+@media (max-width: 480px) {
+    .nav-center a,
+    .nav-center .category-nav-button {
+        font-size: 11px;
+        padding: var(--space-1) var(--space-2);
+    }
+}

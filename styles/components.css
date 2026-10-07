@@ -1,0 +1,942 @@
+/* ===================================================
+   Reusable Component Styles
+   Buttons, Inputs, Cards, Badges
+   =================================================== */
+
+
+/* ===================================================
+   BUTTONS
+   =================================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    line-height: var(--leading-tight);
+    border: 1px solid transparent;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition:
+        background-color var(--transition-base),
+        color var(--transition-base),
+        border-color var(--transition-base),
+        box-shadow var(--transition-base),
+        transform var(--transition-base);
+    text-decoration: none;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    pointer-events: none;
+}
+
+.btn:hover::after {
+    opacity: 1;
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn:disabled::after {
+    display: none;
+}
+
+
+/* ===================================================
+   PRIMARY BUTTON
+   =================================================== */
+
+.btn-primary {
+    background-color: #ffffff;
+    color: #111111;
+    border-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.btn-primary:hover {
+    background-color: #111111;
+    color: #ffffff;
+    border-color: #111111;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    transform: translateY(-1px);
+}
+
+.dark .btn-primary {
+    background-color: #ffffff;
+    color: #111111;
+    border-color: #ffffff;
+}
+
+.dark .btn-primary:hover {
+    background-color: #111111;
+    color: #ffffff;
+    border-color: #111111;
+}
+
+
+/* ===================================================
+   SECONDARY BUTTON
+   =================================================== */
+
+.btn-secondary {
+    background: transparent;
+    color: var(--color-text);
+    border: 1.5px solid var(--color-text);
+}
+
+.btn-secondary:hover {
+    background: var(--color-text);
+    color: var(--color-bg);
+    border-color: var(--color-text);
+    transform: translateY(-1px);
+}
+
+
+/* ===================================================
+   DANGER BUTTON
+   =================================================== */
+
+.btn-danger {
+    background: var(--color-danger);
+    color: #ffffff;
+    border-color: var(--color-danger);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+}
+
+.btn-danger:hover {
+    background: var(--color-danger-hover);
+    color: #ffffff;
+    border-color: var(--color-danger-hover);
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35);
+    transform: translateY(-1px);
+}
+
+
+/* ===================================================
+   GHOST BUTTON
+   =================================================== */
+
+.btn-ghost {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border-color: transparent;
+}
+
+.btn-ghost:hover {
+    background: var(--color-bg-subtle);
+    color: var(--color-text);
+}
+
+
+/* ===================================================
+   BUTTON SIZES
+   =================================================== */
+
+.btn-sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-xs);
+    border-radius: var(--radius-md);
+}
+
+.btn-lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--text-base);
+    border-radius: var(--radius-xl);
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-lg);
+}
+
+
+/* ===================================================
+   FORM INPUTS
+   =================================================== */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.form-label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-bg-elevated);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    box-sizing: border-box;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background-color var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.form-input:hover,
+.form-select:hover {
+    border-color: var(--color-text-muted);
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-subtle);
+}
+
+.form-input::placeholder {
+    color: var(--color-text-muted);
+}
+
+
+/* ===================================================
+   SELECT / DROPDOWN (Neutral Theme)
+   =================================================== */
+
+select,
+.form-select,
+.dropdown-select,
+.analytics-dropdown {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    border: 1px solid #444444 !important;
+    border-radius: var(--radius-md);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right var(--space-4) center !important;
+    padding-right: var(--space-10) !important;
+    outline: none;
+}
+
+select option,
+.form-select option,
+.dropdown-select option,
+.analytics-dropdown option {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    padding: 8px 12px;
+}
+
+select option:checked,
+.form-select option:checked,
+.dropdown-select option:checked,
+.analytics-dropdown option:checked {
+    background-color: #bdbdbd !important;
+    background: #bdbdbd linear-gradient(0deg, #bdbdbd 0%, #bdbdbd 100%) !important;
+    color: #000000 !important;
+}
+
+select option:hover,
+select option:focus,
+.form-select option:hover,
+.form-select option:focus,
+.dropdown-select option:hover,
+.dropdown-select option:focus,
+.analytics-dropdown option:hover,
+.analytics-dropdown option:focus {
+    background-color: #bdbdbd !important;
+    background: #bdbdbd linear-gradient(0deg, #bdbdbd 0%, #bdbdbd 100%) !important;
+    color: #000000 !important;
+}
+
+
+/* ===================================================
+   DARK MODE FORM CONTROLS
+   =================================================== */
+
+.dark .form-input {
+    background-color: #1b1b1b;
+    color: #f5f5f5;
+    border-color: #333333;
+}
+
+.dark select,
+.dark .form-select,
+.dark .dropdown-select,
+.dark .analytics-dropdown {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    border-color: #444444 !important;
+}
+
+.dark .form-input::placeholder {
+    color: #888888;
+}
+
+.dark select option,
+.dark .form-select option,
+.dark .dropdown-select option,
+.dark .analytics-dropdown option {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+.dark select option:checked,
+.dark .form-select option:checked,
+.dark .dropdown-select option:checked,
+.dark .analytics-dropdown option:checked {
+    background-color: #bdbdbd !important;
+    background: #bdbdbd linear-gradient(0deg, #bdbdbd 0%, #bdbdbd 100%) !important;
+    color: #000000 !important;
+}
+
+.dark select option:hover,
+.dark .form-select option:hover,
+.dark .dropdown-select option:hover,
+.dark .analytics-dropdown option:hover {
+    background-color: #bdbdbd !important;
+    background: #bdbdbd linear-gradient(0deg, #bdbdbd 0%, #bdbdbd 100%) !important;
+    color: #000000 !important;
+}
+
+
+/* ===================================================
+   CARDS
+   =================================================== */
+
+.card {
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition:
+        transform var(--transition-base),
+        box-shadow var(--transition-base),
+        border-color var(--transition-base);
+}
+
+.card-glass {
+    background: var(--gradient-card);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--color-border);
+}
+
+/* .card-interactive:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-primary-light);
+} */
+
+.product-card {
+    transition:
+        transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 0.28s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+}
+
+.product-card:active {
+    transform: translateY(-1px) scale(0.985);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.product-card-image img {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+}
+
+.product-card:hover .product-card-image img {
+    transform: scale(1.05);
+}
+
+.card-body {
+    padding: var(--space-6);
+}
+
+
+/* ===================================================
+   BADGES
+   =================================================== */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    border-radius: var(--radius-full);
+    letter-spacing: 0.02em;
+}
+
+.badge-primary {
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+}
+
+.badge-success {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.badge-danger {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.badge-dark {
+    background: #222222;
+    color: #ffffff;
+}
+
+.dark .badge-dark {
+    background: #ffffff;
+    color: #111111;
+}
+
+
+/* ===================================================
+   SECTION HEADER
+   =================================================== */
+
+.section-header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+}
+
+.section-header h2 {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+    letter-spacing: -0.02em;
+}
+
+.section-header p {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+
+/* ===================================================
+   EMPTY STATE
+   =================================================== */
+
+.empty-state {
+    text-align: center;
+    padding: var(--space-16) var(--space-8);
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-6);
+    display: block;
+    animation: float 3s ease-in-out infinite;
+}
+
+.empty-state h3 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+}
+
+.empty-state p {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-8);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* ===================================================
+   DIVIDER
+   =================================================== */
+
+.divider {
+    border: none;
+    height: 1px;
+    background: var(--color-border);
+    margin: var(--space-4) 0;
+}
+
+
+/* ===================================================
+   QUANTITY CONTROL
+   =================================================== */
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-1);
+}
+
+.quantity-control .btn-icon {
+    width: 32px;
+    height: 32px;
+    font-size: var(--text-base);
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        border-color var(--transition-fast);
+}
+
+.quantity-control .btn-icon:hover {
+    background: var(--color-text);
+    color: var(--color-bg);
+    border-color: var(--color-text);
+}
+
+.quantity-control span {
+    min-width: 32px;
+    text-align: center;
+    color: var(--color-text);
+    font-weight: var(--font-semibold);
+    font-size: var(--text-sm);
+}
+
+
+/* ===================================================
+   PRICE DISPLAY
+   =================================================== */
+
+.price-display {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.price-current {
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    color: var(--color-success);
+}
+
+.price-original {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+}
+
+.price-discount {
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    color: var(--color-accent);
+    background: rgba(245, 158, 11, 0.1);
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-sm);
+}
+
+
+/* ===================================================
+   SITE LOGO
+   =================================================== */
+
+.site-logo {
+    width: 120px;
+    height: auto;
+}
+
+
+/* ===================================================
+   NOTIFICATION
+   =================================================== */
+
+.notification-btn {
+    position: relative;
+    border: none;
+    background: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+    font-size: 20px;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-count {
+    position: absolute;
+    top: -4px;
+    right: -5px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+
+/* ===================================================
+   LOGIN / REGISTER BUTTONS
+   =================================================== */
+
+.auth-form .btn-primary,
+.auth-form button[type="submit"] {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #000000 !important;
+}
+
+.auth-form .btn-primary:hover,
+.auth-form button[type="submit"]:hover {
+    background: #222222 !important;
+    color: #ffffff !important;
+}
+
+.dark .auth-form .btn-primary,
+.dark .auth-form button[type="submit"] {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #ffffff !important;
+}
+
+.dark .auth-form .btn-primary:hover,
+.dark .auth-form button[type="submit"]:hover {
+    background: #e5e5e5 !important;
+    color: #000000 !important;
+}
+
+
+/* ===================================================
+   PRODUCT CARD ADD TO CART
+   =================================================== */
+
+.product-card-footer .btn-primary,
+.dark .product-card-footer .btn-primary {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
+}
+
+.product-card-footer .btn-primary:hover,
+.dark .product-card-footer .btn-primary:hover {
+    background-color: #222222 !important;
+    color: #ffffff !important;
+    border-color: #222222 !important;
+}
+
+
+/* ===================================================
+   HEADER / NAVBAR
+   Transparent style, white text & icons
+   =================================================== */
+
+.nav-center a,
+.nav-center .category-nav-button,
+.nav-right .nav-btn-logout,
+.nav-right .nav-link-login {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    font-family: inherit;
+    line-height: inherit;
+    padding: var(--space-2) var(--space-3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.nav-center a:hover,
+.nav-center .category-nav-button:hover,
+.nav-right .nav-btn-logout:hover,
+.nav-right .nav-link-login:hover {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: rgba(255, 255, 255, 0.75) !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.nav-center a:active,
+.nav-center .category-nav-button:active,
+.nav-right .nav-btn-logout:active,
+.nav-right .nav-link-login:active {
+    transform: none !important;
+}
+
+/* ===================================================
+   WISHLIST BUTTON MICRO-INTERACTIONS
+   =================================================== */
+
+.wishlist-btn-interactive {
+    will-change: transform;
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, opacity 0.15s ease !important;
+}
+
+.wishlist-btn-interactive:hover:not(:disabled) {
+    transform: scale(1.08) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22) !important;
+}
+
+.wishlist-btn-interactive:active:not(:disabled) {
+    transform: scale(0.92) !important;
+}
+
+/* ===================================================
+   CINEMATIC LOGIN SUCCESS TRANSITION
+   =================================================== */
+
+.login-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 99999;
+    pointer-events: all;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    background: transparent;
+}
+
+/* Two black shutter panels */
+.login-shutter {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 50.5vh;
+    height: 50.5dvh;
+    background-color: #000000;
+    will-change: transform;
+    pointer-events: auto;
+}
+
+.login-shutter-top {
+    top: 0;
+    transform: translateY(0);
+    transition: transform 0.52s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.login-shutter-bottom {
+    bottom: 0;
+    transform: translateY(0);
+    transition: transform 0.52s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Shutter opens from the center */
+.login-transition.shutter-open .login-shutter-top {
+    transform: translateY(-100%);
+}
+
+.login-transition.shutter-open .login-shutter-bottom {
+    transform: translateY(100%);
+}
+
+/* Centered white logo container */
+.login-transition-logo-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 100000;
+}
+
+/* Subtle professional logo animation */
+.login-transition-logo {
+    width: clamp(140px, 22vw, 240px);
+    height: auto;
+    max-height: 90px;
+    object-fit: contain;
+    display: block;
+    opacity: 0;
+    transform: scale(0.96);
+    transition: opacity 0.25s ease-out, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.login-transition.logo-visible .login-transition-logo {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.login-transition.logo-fadeout .login-transition-logo {
+    opacity: 0;
+    transform: scale(0.98);
+    transition: opacity 0.15s ease-in, transform 0.15s ease-in;
+}
+
+/* Accessibility: prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    .login-shutter {
+        transition: none !important;
+    }
+    .login-shutter-top,
+    .login-shutter-bottom {
+        transition: none !important;
+    }
+    .login-transition-logo {
+        transition: none !important;
+    }
+    .login-transition.shutter-open .login-shutter-top,
+    .login-transition.shutter-open .login-shutter-bottom {
+        opacity: 0;
+        transform: none !important;
+    }
+}
+
+
+/* ===================================================
+   FEATURE CARD LIVE ANIMATIONS
+   =================================================== */
+
+.feature-card {
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Make emoji/icon animate independently */
+.feature-card .feature-icon {
+    display: inline-block;
+    will-change: transform;
+}
+
+/* ===================================================
+   FREE SHIPPING - TRUCK
+   =================================================== */
+
+.feature-card:nth-child(1) .feature-icon {
+    animation: featureTruckMove 2s ease-in-out infinite;
+}
+
+@keyframes featureTruckMove {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(8px);
+    }
+}
+
+/* ===================================================
+   SECURE PAYMENT - LOCK
+   =================================================== */
+
+.feature-card:nth-child(2) .feature-icon {
+    animation: featureLockBounce 2s ease-in-out infinite;
+}
+
+@keyframes featureLockBounce {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+/* ===================================================
+   EASY RETURNS - RETURN ARROW
+   =================================================== */
+
+.feature-card:nth-child(3) .feature-icon {
+    animation: featureReturnMove 2.5s ease-in-out infinite;
+}
+
+@keyframes featureReturnMove {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(-12deg);
+    }
+}
+
+/* ===================================================
+   ACCESSIBILITY
+   =================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .feature-card,
+    .feature-card .feature-icon {
+        animation: none !important;
+        transition: none !important;
+    }
+}
